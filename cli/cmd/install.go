@@ -208,7 +208,7 @@ func render(config installConfig, w io.Writer, options *installOptions) error {
 		}
 	}
 
-	injectOptions := newInjectOptions()
+	injectOptions := NewInjectOptions()
 	injectOptions.proxyConfigOptions = options.proxyConfigOptions
 
 	// Special case for linkerd-proxy running in the Prometheus pod.

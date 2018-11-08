@@ -12,14 +12,14 @@ import (
 )
 
 func TestInjectYAML(t *testing.T) {
-	defaultOptions := newInjectOptions()
+	defaultOptions := NewInjectOptions()
 	defaultOptions.linkerdVersion = "testinjectversion"
 
-	tlsOptions := newInjectOptions()
+	tlsOptions := NewInjectOptions()
 	tlsOptions.linkerdVersion = "testinjectversion"
 	tlsOptions.tls = "optional"
 
-	proxyRequestOptions := newInjectOptions()
+	proxyRequestOptions := NewInjectOptions()
 	proxyRequestOptions.linkerdVersion = "testinjectversion"
 	proxyRequestOptions.proxyCpuRequest = "110m"
 	proxyRequestOptions.proxyMemoryRequest = "100Mi"
@@ -149,7 +149,7 @@ func TestInjectYAML(t *testing.T) {
 }
 
 func TestRunInjectCmd(t *testing.T) {
-	testInjectOptions := newInjectOptions()
+	testInjectOptions := NewInjectOptions()
 	testInjectOptions.linkerdVersion = "testinjectversion"
 	testCases := []struct {
 		inputFileName        string
@@ -204,7 +204,7 @@ func TestInjectFilePath(t *testing.T) {
 	var (
 		resourceFolder = filepath.Join("testdata", "inject-filepath", "resources")
 		expectedFolder = filepath.Join("inject-filepath", "expected")
-		options        = newInjectOptions()
+		options        = NewInjectOptions()
 	)
 
 	t.Run("read from files", func(t *testing.T) {
