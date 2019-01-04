@@ -27,7 +27,7 @@ type logCmdOpts struct {
 	k8sClient        *http.Client
 	controlPlanePods *v1.PodList
 	clientset        *kubernetes.Clientset
-	*logFilter
+	logFilter
 }
 
 type ColorPicker struct {
@@ -40,18 +40,18 @@ type ColorPicker struct {
 func (c *ColorPicker) pick(id string) chalk.Color {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if color, ok := c.m[id]; !ok {
-		if c.lastUsedColor > len(c.availableColors)-1 {
-			c.lastUsedColor = 1
-		}
-		newColor := c.availableColors[c.lastUsedColor]
-		c.m[id] = newColor
-		c.lastUsedColor += 1
-		return newColor
-	} else {
+
+	if color, ok := c.m[id]; ok {
 		return color
 	}
 
+	if c.lastUsedColor > len(c.availableColors)-1 {
+		c.lastUsedColor = 0
+	}
+
+	c.m[id] = c.availableColors[c.lastUsedColor]
+	c.lastUsedColor++
+	return c.m[id]
 }
 
 func newColorPicker() *ColorPicker {
@@ -63,7 +63,7 @@ func newColorPicker() *ColorPicker {
 			chalk.Cyan,
 			chalk.Green,
 			chalk.Magenta,
-			chalk.White,
+			// chalk.White,
 		},
 	}
 }
@@ -140,7 +140,7 @@ func runLogOutput(writer io.Writer, opts *logCmdOpts) error {
 					stream, err := opts.clientset.
 						CoreV1().
 						Pods(controlPlaneNamespace).
-						GetLogs(p, &v1.PodLogOptions{Container: c}).
+						GetLogs(p, &v1.PodLogOptions{Container: c, Follow: true}).
 						Stream()
 
 					if err != nil {
@@ -150,11 +150,17 @@ func runLogOutput(writer io.Writer, opts *logCmdOpts) error {
 					defer stream.Close()
 
 					bufReader := bufio.NewReader(stream)
-					bytes, err := bufReader.ReadBytes('\n')
+					bytes := []byte{}
+					loglineID := fmt.Sprintf("[%s %s]", p, c)
 
-					loglineId := fmt.Sprintf("[%s %s]", p, c)
-
-					lineRead <- fmt.Sprintf("%s %s", colorPicker.pick(loglineId).Color(loglineId), string(bytes))
+					for {
+						bytes, err = bufReader.ReadBytes('\n')
+						if err != nil {
+							fmt.Printf("ERR: %s\n", err)
+							return
+						}
+						lineRead <- fmt.Sprintf("%s %s", colorPicker.pick(loglineID).Color(loglineID), string(bytes))
+					}
 				}(pod.Name, container.Name)
 			}
 		}
@@ -166,9 +172,7 @@ func runLogOutput(writer io.Writer, opts *logCmdOpts) error {
 			_, err := fmt.Fprint(writer, line)
 			if err != nil {
 				os.Exit(1)
-
 			}
-		default:
 		}
 	}
 
@@ -177,32 +181,32 @@ func runLogOutput(writer io.Writer, opts *logCmdOpts) error {
 
 // validateArgs returns podWithContainer if args and container name matches
 // a valid pod and a valid container within that pod
-func validateArgs(args []string, pods *v1.PodList, containerName string) (*logFilter, error) {
+func validateArgs(args []string, pods *v1.PodList, containerName string) (logFilter, error) {
+	if pods == nil {
+		return logFilter{}, errors.New("no pods to filter logs from")
+	}
+
 	var podName string
 	if len(args) == 1 {
 		podName = args[0]
 	}
 
-	if pods == nil {
-		return nil, errors.New("no pods to filter logs from")
+	if podName == "" && containerName == "" {
+		return logFilter{}, nil
 	}
 
 	for _, pod := range pods.Items {
-		if pod.Name == podName {
-			return &logFilter{pod, containerName}, nil
-		}
-		for _, container := range pod.Spec.Containers {
-			if containerName != "" && containerName == container.Name {
-				return &logFilter{pod, containerName}, nil
+		if podName == "" || podName == pod.Name {
+			for _, container := range pod.Spec.Containers {
+				if containerName == "" || containerName == container.Name {
+					return logFilter{pod, containerName}, nil
+				}
 			}
 		}
 	}
 
-	// If we have exhausted the entire pod list and haven't found the container we are looking for
-	// return as error as that container does not exist in the control plane.
-	if containerName != "" {
-		return nil, errors.New(fmt.Sprintf("[%s] is not a valid container in pod [%s]", containerName, podName))
-	}
-
-	return &logFilter{}, nil
+	// If we have exhausted the entire pod list and haven't found the pod and/or
+	// container we are looking for return an error as that pod/container does not
+	// exist in the control plane.
+	return logFilter{}, errors.New(fmt.Sprintf("[%s] is not a valid container in pod [%s]", containerName, podName))
 }
