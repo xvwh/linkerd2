@@ -156,7 +156,7 @@ func runLogOutput(writer io.Writer, opts *logCmdOpts) error {
 					for {
 						bytes, err = bufReader.ReadBytes('\n')
 						if err != nil {
-							fmt.Printf("ERR: %s\n", err)
+							fmt.Printf("Log reader returned: %s\n", err)
 							return
 						}
 						lineRead <- fmt.Sprintf("%s %s", colorPicker.pick(loglineID).Color(loglineID), string(bytes))
