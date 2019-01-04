@@ -436,12 +436,11 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:ccbb809cca94fd697821dced4515c88a1ed45f3d063b3f921b134b63d4311dc2"
+  digest = "1:0fe2dbe1fbefac78925874991214dff120ab989a389389577a0891f28c99f315"
   name = "github.com/ttacon/chalk"
   packages = ["."]
   pruneopts = ""
-  revision = "76b3c8b611dea8f83e49e9ce81fc2b189e0ef3d2"
-  version = "v0.1"
+  revision = "22c06c80ed312dcb6e1cf394f9634aa2c4676e22"
 
 [[projects]]
   branch = "master"

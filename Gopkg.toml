@@ -60,7 +60,7 @@ required = [
   version = "v0.17.2"
 [[constraint]]
   name = "github.com/ttacon/chalk"
-  version = "v0.1"
+  revision = "22c06c80ed312dcb6e1cf394f9634aa2c4676e22"
 #
 # k8s.io/kubernetes dependency fixes
 # taken from https://github.com/kubernetes/kubernetes/blob/master/Godeps/Godeps.json
