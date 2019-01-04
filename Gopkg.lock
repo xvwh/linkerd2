@@ -436,6 +436,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:ccbb809cca94fd697821dced4515c88a1ed45f3d063b3f921b134b63d4311dc2"
+  name = "github.com/ttacon/chalk"
+  packages = ["."]
+  pruneopts = ""
+  revision = "76b3c8b611dea8f83e49e9ce81fc2b189e0ef3d2"
+  version = "v0.1"
+
+[[projects]]
   branch = "master"
   digest = "1:733bbd39aeb07cba7586933ac301c66f5504f687b393529125affaf9a096d2a8"
   name = "golang.org/x/crypto"
@@ -963,6 +971,7 @@
     "github.com/sergi/go-diff/diffmatchpatch",
     "github.com/sirupsen/logrus",
     "github.com/spf13/cobra",
+    "github.com/ttacon/chalk",
     "golang.org/x/net/context",
     "google.golang.org/grpc",
     "google.golang.org/grpc/codes",
