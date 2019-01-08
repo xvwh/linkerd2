@@ -60,13 +60,18 @@ required = [
   name = "github.com/go-openapi/spec"
   version = "v0.17.2"
 
+# TODO: roll forward to 1.10.0, remove override
 [[constraint]]
   name = "github.com/wercker/stern"
-  version = "1.10.0"
+  version = "1.6.0"
 #
 # k8s.io/kubernetes dependency fixes
 # taken from https://github.com/kubernetes/kubernetes/blob/master/Godeps/Godeps.json
 #
+
+[[override]]
+  name = "github.com/wercker/stern"
+  revision = "b04b5491222d9743529cb859a20d34ce2bb763af"
 
 [[override]]
   name = "github.com/docker/distribution"

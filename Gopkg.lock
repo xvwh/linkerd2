@@ -468,15 +468,14 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:6119a062dc22db0e2e969bf845eec49e4ee27b94a379b2b4746aa96c07eece5b"
+  digest = "1:0c44527cd02ee20d1035a7f0eac9b183886ff876e54d8ae2614b6a221eb89ad2"
   name = "github.com/wercker/stern"
   packages = [
     "kubernetes",
     "stern",
   ]
   pruneopts = ""
-  revision = "807830e577193a63ede18bb8c7a8b86df8694c00"
-  version = "1.10.0"
+  revision = "b04b5491222d9743529cb859a20d34ce2bb763af"
 
 [[projects]]
   branch = "master"
