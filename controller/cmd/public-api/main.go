@@ -50,6 +50,7 @@ func main() {
 		nil,
 		restrictToNamespace,
 		k8s.Deploy,
+		k8s.DS,
 		k8s.Pod,
 		k8s.RC,
 		k8s.RS,
