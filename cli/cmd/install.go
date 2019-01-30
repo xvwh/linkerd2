@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
-	"github.com/linkerd/linkerd2/cli/install"
+	"github.com/gobuffalo/packr/v2"
 	"github.com/linkerd/linkerd2/pkg/k8s"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
@@ -86,6 +86,7 @@ const (
 	defaultControllerReplicas       = 1
 	defaultHAControllerReplicas     = 3
 
+	relativeChartPath         = "../chart"
 	baseTemplateName          = "templates/base.yaml"
 	tlsTemplateName           = "templates/tls.yaml"
 	proxyInjectorTemplateName = "templates/proxy_injector.yaml"
@@ -222,15 +223,34 @@ func render(config installConfig, w io.Writer, options *installOptions) error {
 	if err != nil {
 		return err
 	}
+	chartConfig := &chart.Config{Raw: string(rawValues), Values: map[string]*chart.Value{}}
 
-	chrtConfig := &chart.Config{Raw: string(rawValues), Values: map[string]*chart.Value{}}
+	// Set up a new box by giving it a relative path to a folder on disk
+	chartBox := packr.New("Chart Box", relativeChartPath)
+
+	chartTmpl, err := chartBox.Find(chartutil.ChartfileName)
+	if err != nil {
+		return err
+	}
+	baseTmpl, err := chartBox.Find(baseTemplateName)
+	if err != nil {
+		return err
+	}
+	tlsTmpl, err := chartBox.Find(tlsTemplateName)
+	if err != nil {
+		return err
+	}
+	proxyInjectorTmpl, err := chartBox.Find(proxyInjectorTemplateName)
+	if err != nil {
+		return err
+	}
 
 	// Load chart files
 	files := []*chartutil.BufferedFile{
-		{Name: chartutil.ChartfileName, Data: install.Chart},
-		{Name: baseTemplateName, Data: install.BaseTemplate},
-		{Name: tlsTemplateName, Data: install.TLSTemplate},
-		{Name: proxyInjectorTemplateName, Data: install.ProxyInjectorTemplate},
+		{Name: chartutil.ChartfileName, Data: chartTmpl},
+		{Name: baseTemplateName, Data: baseTmpl},
+		{Name: tlsTemplateName, Data: tlsTmpl},
+		{Name: proxyInjectorTemplateName, Data: proxyInjectorTmpl},
 	}
 
 	// Create chart and render templates
@@ -250,7 +270,7 @@ func render(config installConfig, w io.Writer, options *installOptions) error {
 		KubeVersion: "",
 	}
 
-	renderedTemplates, err := renderutil.Render(chrt, chrtConfig, renderOpts)
+	renderedTemplates, err := renderutil.Render(chrt, chartConfig, renderOpts)
 	if err != nil {
 		return err
 	}

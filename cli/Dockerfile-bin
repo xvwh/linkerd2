@@ -1,5 +1,9 @@
 ## compile binaries
-FROM gcr.io/linkerd-io/go-deps:ceb2d9f1 as golang
+FROM gcr.io/linkerd-io/go-deps:da6a119d as golang
+
+# Install packr in order to use custom build command for static files
+RUN go install ./go/src/github.com/gobuffalo/packr/v2/packr2
+
 WORKDIR /go/src/github.com/linkerd/linkerd2
 COPY cli cli
 COPY controller/k8s controller/k8s
@@ -8,18 +12,22 @@ COPY controller/gen controller/gen
 COPY pkg pkg
 RUN mkdir -p /out
 
+# Packr needs to build in the directory that the Box is relative to
+WORKDIR /go/src/github.com/linkerd/linkerd2/cli
+
 # Cache builds without version info
-RUN CGO_ENABLED=0 GOOS=darwin  go build -o /out/linkerd-darwin  -ldflags "-s -w" ./cli
-RUN CGO_ENABLED=0 GOOS=linux   go build -o /out/linkerd-linux   -ldflags "-s -w" ./cli
-RUN CGO_ENABLED=0 GOOS=windows go build -o /out/linkerd-windows -ldflags "-s -w" ./cli
+RUN CGO_ENABLED=0 GOOS=darwin  packr2 build -o /out/linkerd-darwin  -ldflags "-s -w"
+RUN CGO_ENABLED=0 GOOS=linux   packr2 build -o /out/linkerd-linux   -ldflags "-s -w"
+RUN CGO_ENABLED=0 GOOS=windows packr2 build -o /out/linkerd-windows -ldflags "-s -w"
 
 ARG LINKERD_VERSION
 ENV GO_LDFLAGS="-s -w -X github.com/linkerd/linkerd2/pkg/version.Version=${LINKERD_VERSION}"
-RUN CGO_ENABLED=0 GOOS=darwin  go build -o /out/linkerd-darwin  -ldflags "${GO_LDFLAGS}" ./cli
-RUN CGO_ENABLED=0 GOOS=linux   go build -o /out/linkerd-linux   -ldflags "${GO_LDFLAGS}" ./cli
-RUN CGO_ENABLED=0 GOOS=windows go build -o /out/linkerd-windows -ldflags "${GO_LDFLAGS}" ./cli
+RUN CGO_ENABLED=0 GOOS=darwin  packr2 build -o /out/linkerd-darwin  -ldflags "${GO_LDFLAGS}"
+RUN CGO_ENABLED=0 GOOS=linux   packr2 build -o /out/linkerd-linux   -ldflags "${GO_LDFLAGS}"
+RUN CGO_ENABLED=0 GOOS=windows packr2 build -o /out/linkerd-windows -ldflags "${GO_LDFLAGS}"
 
 ## export without sources & dependencies
+WORKDIR /go/src/github.com/linkerd/linkerd2
 FROM scratch
 COPY LICENSE /linkerd/LICENSE
 COPY --from=golang /out /out
