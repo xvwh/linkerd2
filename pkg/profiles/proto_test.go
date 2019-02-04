@@ -40,7 +40,7 @@ service VotingService {
 		},
 		Spec: sp.ServiceProfileSpec{
 			Routes: []*sp.RouteSpec{
-				&sp.RouteSpec{
+				{
 					Name: "VotePoop",
 					Condition: &sp.RequestMatch{
 						PathRegex: `/emojivoto\.v1\.VotingService/VotePoop`,

@@ -81,7 +81,7 @@ func listPodResponsesEqual(a *pb.ListPodsResponse, b *pb.ListPodsResponse) bool 
 func TestListPods(t *testing.T) {
 	t.Run("Queries to the ListPods endpoint", func(t *testing.T) {
 		expectations := []listPodsExpected{
-			listPodsExpected{
+			{
 				err: nil,
 				promRes: model.Vector{
 					&model.Sample{
@@ -152,7 +152,7 @@ spec:
 				req: &pb.ListPodsRequest{},
 				res: &pb.ListPodsResponse{
 					Pods: []*pb.Pod{
-						&pb.Pod{
+						{
 							Name:            "emojivoto/emojivoto-meshed",
 							Added:           true,
 							SinceLastReport: &duration.Duration{},
@@ -160,7 +160,7 @@ spec:
 							PodIP:           "1.2.3.4",
 							Owner:           &pb.Pod_Deployment{Deployment: "emojivoto/meshed-deployment"},
 						},
-						&pb.Pod{
+						{
 							Name:   "emojivoto/emojivoto-not-meshed",
 							Status: "Pending",
 							PodIP:  "4.3.2.1",
@@ -169,7 +169,7 @@ spec:
 					},
 				},
 			},
-			listPodsExpected{
+			{
 				err: fmt.Errorf("cannot set both namespace and resource in the request. These are mutually exclusive"),
 				promRes: model.Vector{
 					&model.Sample{
@@ -188,7 +188,7 @@ spec:
 				},
 				res: nil,
 			},
-			listPodsExpected{
+			{
 				err: nil,
 				promRes: model.Vector{
 					&model.Sample{
@@ -207,7 +207,7 @@ spec:
 				res:              &pb.ListPodsResponse{},
 				promReqNamespace: "testnamespace",
 			},
-			listPodsExpected{
+			{
 				err: nil,
 				promRes: model.Vector{
 					&model.Sample{
@@ -228,7 +228,7 @@ spec:
 				promReqNamespace: "testnamespace",
 			},
 			// non-matching owner type -> no pod in the result
-			listPodsExpected{
+			{
 				err: nil,
 				promRes: model.Vector{
 					&model.Sample{
@@ -264,7 +264,7 @@ status:
 				res: &pb.ListPodsResponse{},
 			},
 			// matching owner type -> pod is part of the result
-			listPodsExpected{
+			{
 				err: nil,
 				promRes: model.Vector{
 					&model.Sample{
@@ -299,7 +299,7 @@ status:
 				},
 				res: &pb.ListPodsResponse{
 					Pods: []*pb.Pod{
-						&pb.Pod{
+						{
 							Name:            "emojivoto/emojivoto-meshed",
 							Added:           true,
 							SinceLastReport: &duration.Duration{},
@@ -311,7 +311,7 @@ status:
 				},
 			},
 			// matching label in request -> pod is in the response
-			listPodsExpected{
+			{
 				err: nil,
 				promRes: model.Vector{
 					&model.Sample{
@@ -343,7 +343,7 @@ status:
 				},
 				res: &pb.ListPodsResponse{
 					Pods: []*pb.Pod{
-						&pb.Pod{
+						{
 							Name:            "emojivoto/emojivoto-meshed",
 							Added:           true,
 							SinceLastReport: &duration.Duration{},
@@ -355,7 +355,7 @@ status:
 				},
 			},
 			// NOT matching label in request -> pod is NOT in the response
-			listPodsExpected{
+			{
 				err: nil,
 				promRes: model.Vector{
 					&model.Sample{
@@ -461,7 +461,7 @@ func listServiceResponsesEqual(a pb.ListServicesResponse, b pb.ListServicesRespo
 func TestListServices(t *testing.T) {
 	t.Run("Successfully queryies for services", func(t *testing.T) {
 		expectations := []listServicesExpected{
-			listServicesExpected{
+			{
 				err: nil,
 				k8sRes: []string{`
 apiVersion: v1
@@ -479,11 +479,11 @@ metadata:
 				},
 				res: pb.ListServicesResponse{
 					Services: []*pb.Service{
-						&pb.Service{
+						{
 							Name:      "service-foo",
 							Namespace: "emojivoto",
 						},
-						&pb.Service{
+						{
 							Name:      "service-bar",
 							Namespace: "default",
 						},

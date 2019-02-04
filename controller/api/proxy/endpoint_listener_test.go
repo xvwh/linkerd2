@@ -50,12 +50,12 @@ var (
 	}
 
 	add = []*updateAddress{
-		&updateAddress{address: addedAddress1, pod: pod1},
-		&updateAddress{address: addedAddress2, pod: pod2},
+		{address: addedAddress1, pod: pod1},
+		{address: addedAddress2, pod: pod2},
 	}
 
 	remove = []*updateAddress{
-		&updateAddress{address: removedAddress1},
+		{address: removedAddress1},
 	}
 )
 
@@ -174,7 +174,7 @@ func TestEndpointListener(t *testing.T) {
 		}
 
 		add := []*updateAddress{
-			&updateAddress{address: addedAddress1, pod: podForAddedAddress1},
+			{address: addedAddress1, pod: podForAddedAddress1},
 		}
 		listener.Update(add, nil)
 
@@ -230,7 +230,7 @@ func TestEndpointListener(t *testing.T) {
 		}
 
 		add := []*updateAddress{
-			&updateAddress{address: addedAddress1, pod: podForAddedAddress1},
+			{address: addedAddress1, pod: podForAddedAddress1},
 		}
 		listener.Update(add, nil)
 
@@ -276,7 +276,7 @@ func TestEndpointListener(t *testing.T) {
 		}
 
 		add := []*updateAddress{
-			&updateAddress{address: addedAddress1, pod: podForAddedAddress1},
+			{address: addedAddress1, pod: podForAddedAddress1},
 		}
 		listener.Update(add, nil)
 
